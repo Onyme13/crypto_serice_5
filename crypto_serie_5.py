@@ -17,7 +17,7 @@ def Initialization(Input):
 
 
 """======================================================================================="""
-"""!!!!!!!!!!!!! binary rotation !!!!!!!!!!!!!!!!!!!"""
+"""!!!!!!!!!!!!! binary rotation  A FONIR !!!!!!!!!!!!!!!!!!!"""
 
 def key_generation(Key):
 
@@ -26,8 +26,6 @@ def key_generation(Key):
     for rotation in Rotations:
         #key permutation pc_1
         output = Key
-        print(output)
-        print("XXX")
 
         for x in range(len(PC_1)):
             output[PC_1[x]-1] = Key[x]
@@ -36,24 +34,24 @@ def key_generation(Key):
         right_half = output[28:57]
 
         #binary rotation
-        for i in range(len(left_half)):
-            left = [2] * len(left_half)
-            left[i-rotation] = left_half[i]
-
+        left = left_half[rotation:] + left_half[0:rotation]
         for i in range(len(right_half)):
-            right = [2] * len(right_half)
+            right = right_half
             right[i-rotation] = right_half[i]
 
+        print("Initial")
+        print(left_half)
         full = left + right
-        print(full)
-        print("YYY")
+        print("Rotation")
+        print(rotation)
+        print("Left")
+        print(left)
+        print("____________________________\n")
 
         #permutation pc_2
         for x in range(len(PC_2)):
             output[PC_2[x]-1] = full[x]
         keys.append(output)
-        print(output)
-        print("\n")
     #print("Liste des cles:\n")
 
     return keys
