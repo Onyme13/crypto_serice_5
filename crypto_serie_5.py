@@ -1,4 +1,3 @@
-from re import X
 from DES_tables import *
 
 
@@ -17,7 +16,6 @@ def Initialization(Input):
 
 
 """======================================================================================="""
-"""!!!!!!!!!!!!! binary rotation  A FONIR !!!!!!!!!!!!!!!!!!!"""
 
 def key_generation(Key):
 
@@ -26,86 +24,83 @@ def key_generation(Key):
     for rotation in Rotations:
         #key permutation pc_1
         output = Key
+#        key = [2] * 48
+        key = []
+
 
         for x in range(len(PC_1)):
             output[PC_1[x]-1] = Key[x]
 
         left_half = output[0:28]
-        right_half = output[28:57]
+        right_half = output[28:56]
+
+
 
         #binary rotation
         left = left_half[rotation:] + left_half[0:rotation]
+        right = right_half[rotation:] + right_half[0:rotation]
+        
         for i in range(len(right_half)):
             right = right_half
             right[i-rotation] = right_half[i]
 
-        print("Initial")
-        print(left_half)
         full = left + right
-        print("Rotation")
-        print(rotation)
-        print("Left")
-        print(left)
-        print("____________________________\n")
 
-        #permutation pc_2
         for x in range(len(PC_2)):
-            output[PC_2[x]-1] = full[x]
-        keys.append(output)
-    #print("Liste des cles:\n")
+            key.insert(PC_2[x]-1,full[x])
 
+        keys.append(key)
     return keys
 
 
 """======================================================================================="""
+"""!!!!!!!!!!!!! conversion to INT !!!!!!!!!!!!!!!!!!!"""
 
 def cipher_function(keys, right_half):
     
     R = [0] * len(E)
-    output = [] * len(R)
-
+    output = ""
+    
     #1
     for x in range(len(E)):
         R[E[x]-1] = right_half[x % (len(right_half))]
+    #print(len(R))
+    #print(len(keys))
+    #print(len(output))
 
-    print(len(R))
-    print(len(keys))
     #2    
     for x in range(len(R)):
-        print(x)
-        print(R[x])
-        print(keys[x])
-        output[x] = R[x] ^ keys[x]
+        output += str(R[x] ^ keys[x])
 
     #3   
-    A_list = [output[0:7],
-    output[6:13],
-    output[12:19],
-    output[18:25],
-    output[24:31],
-    output[30:37],
-    output[36:43],
-    output[42:49]]
+    A_list = [output[0:6],
+    output[6:12],
+    output[12:18],
+    output[18:24],
+    output[24:30],
+    output[30:36],
+    output[36:42],
+    output[42:48]]
 
     A_replacement = ""
 
-    print(A_list)
     for x in range(len(A_list)):
-        print(A_list[0])
         y_value = int(A_list[x][0] + A_list[x][5],2)
-        x_value = int(A_list[x][0:5],2)
-        print(y_value)
-        print(x_value)
+        x_value = int(A_list[x][1:5],2)
+        #print(y_value)
+        #print(x_value)
 
 
-        int_value_replacement = S_Boxes[x][x_value][y_value]
+        int_value_replacement = S_Boxes[x][y_value][x_value]
         A_replacement += (bin(int_value_replacement).replace("0b",""))
     
     #4
-    final = [] * len(A_replacement)
+    final = []
+    print(A_replacement)
     
+
     for x in range(len(P)):
-        final[P[x]-1] = A_replacement[x]
+        final.insert(P[x]-1, A_replacement[x])
 
     return final
 
