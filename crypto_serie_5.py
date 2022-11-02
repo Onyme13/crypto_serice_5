@@ -1,5 +1,4 @@
-from ssl import AlertDescription
-from traceback import print_tb
+from re import X
 from DES_tables import *
 
 
@@ -16,17 +15,9 @@ def Initialization(Input):
 
     return left_half,right_half
 
-Initialization([40,8,48,16,56,24,64,32,
-              39,7,47,15,55,23,63,31,
-              38,6,46,14,54,22,62,30,
-              37,5,45,13,53,21,61,29,
-              36,4,44,12,52,20,60,28,
-              35,3,43,11,51,19,59,27,
-              34,2,42,10,50,18,58,26,
-              33,1,41,9,49,17,57,25])
-
 
 """======================================================================================="""
+"""!!!!!!!!!!!!! binary rotation !!!!!!!!!!!!!!!!!!!"""
 
 def key_generation(Key):
 
@@ -34,33 +25,37 @@ def key_generation(Key):
 
     for rotation in Rotations:
         #key permutation pc_1
-        output = [0] * len(Key)
+        output = Key
+        print(output)
+        print("XXX")
 
         for x in range(len(PC_1)):
             output[PC_1[x]-1] = Key[x]
 
-        left_half = output[0:29]
-        right_half = output[28:]
+        left_half = output[0:28]
+        right_half = output[28:57]
 
         #binary rotation
         for i in range(len(left_half)):
-            left = [0] * len(left_half)
+            left = [2] * len(left_half)
             left[i-rotation] = left_half[i]
 
         for i in range(len(right_half)):
-            right = [0] * len(right_half)
+            right = [2] * len(right_half)
             right[i-rotation] = right_half[i]
 
         full = left + right
+        print(full)
+        print("YYY")
 
         #permutation pc_2
         for x in range(len(PC_2)):
-            output[PC_2[x]-1] = Key[x]
-
+            output[PC_2[x]-1] = full[x]
         keys.append(output)
-    
-    print("Liste des cles:\n")
-    print(keys)
+        print(output)
+        print("\n")
+    #print("Liste des cles:\n")
+
     return keys
 
 
@@ -72,11 +67,16 @@ def cipher_function(keys, right_half):
     output = [] * len(R)
 
     #1
-    for x in range(len(PC_1)):
-        R[E[x]-1] = right_half[x]
-    
+    for x in range(len(E)):
+        R[E[x]-1] = right_half[x % (len(right_half))]
+
+    print(len(R))
+    print(len(keys))
     #2    
-    for x in range(len(keys)):
+    for x in range(len(R)):
+        print(x)
+        print(R[x])
+        print(keys[x])
         output[x] = R[x] ^ keys[x]
 
     #3   
@@ -91,9 +91,14 @@ def cipher_function(keys, right_half):
 
     A_replacement = ""
 
+    print(A_list)
     for x in range(len(A_list)):
+        print(A_list[0])
         y_value = int(A_list[x][0] + A_list[x][5],2)
         x_value = int(A_list[x][0:5],2)
+        print(y_value)
+        print(x_value)
+
 
         int_value_replacement = S_Boxes[x][x_value][y_value]
         A_replacement += (bin(int_value_replacement).replace("0b",""))
@@ -105,3 +110,35 @@ def cipher_function(keys, right_half):
         final[P[x]-1] = A_replacement[x]
 
     return final
+
+"""======================================================================================="""
+
+def encryption(Input,Key):
+
+    first_L, first_R = Initialization(Input) 
+    key = key_generation(Key)
+
+    R_croise = cipher_function(key[0],first_R)
+    L = first_L^R_croise    
+    R = first_L
+
+    for x in range (14):
+        R_croise = cipher_function(key[x+1],R)
+        L = L^R_croise    
+        R = L
+
+    #Final permutation
+    final = L + R
+    output_final = [] * len(final)
+    for x in range(len(final)):
+        output_final[IP_Inverse[x]-1] = final[x]
+
+    print("\n===============================================================================\n")
+    print(output_final)
+
+    return output_final
+
+encryption(message_test,cle_test)
+
+
+
