@@ -56,7 +56,7 @@ def key_generation(Key):
 """======================================================================================="""
 """!!!!!!!!!!!!! conversion to INT !!!!!!!!!!!!!!!!!!!"""
 
-def cipher_function(keys, right_half):
+def cipher_function(right_half, keys):
     
     R = [0] * len(E)
     output = ""
@@ -64,8 +64,8 @@ def cipher_function(keys, right_half):
     #1
     for x in range(len(E)):
         R[E[x]-1] = right_half[x % (len(right_half))]
-    #print(len(R))
-    #print(len(keys))
+    print(len(R))
+    print(len(keys))
     #print(len(output))
 
     #2    
@@ -101,80 +101,46 @@ def cipher_function(keys, right_half):
     #4
     final = []
     
-    print(len(A_replacement))
     for x in range(len(P)):
         final.insert(P[x]-1, A_replacement[x])
 
     return final
 
 """======================================================================================="""
-"""TypeError: unsupported operand type(s) for ^: 'list' and 'list'"""
-
-"""def round(Left,Right,Key):
-    #effectue le round
-    
-    Rtemp = Right
-
-    R_xor_int = []
-    R_xor = cipher_function(Key,Rtemp)
-
-    #cipher function
-    for x in range(len(R_xor)):
-        R_xor_int.append(int(R_xor[x]))       
-
-    Lfinal = []
-    
-    #XOR
-    for x in range(len(R_xor_int)):
-        Lfinal.append(Left[x] ^ R_xor_int[x])    
-        
-    #croisement
-    Rfinal = Lfinal
-    Lfinal = Right
-
-    return Lfinal, Rfinal
-"""
-
 
 
 def encryption(Input,Key):
     x = 0
     key = key_generation(Key)                # génération des clés 
 
-    first_L, first_R = Initialization(Input) # première séparation  
+    L, R = Initialization(Input) # première séparation  
 
     #premier round
+    while x < 16:
+        Rxor = cipher_function(R,key[x])
+        Lfinal = []
 
+        for x in range(len(Rxor)):
+            Lfinal.append(L[x] ^ int(Rxor[x]))
+        
+        L = R
+        R = Lfinal
+        x+=1
 
-    """
-    for x in range (len(key)):
-
-         for x in range(len(first_R)): 
-
-             R_croise = cipher_function(key[0],first_R)
-             R_croise_int = [] 
-
-             for x in range(len(R_croise)):
-                 R_croise_int.append(int(R_croise[x]))       
-             L = first_L^R_croise_int    
-             R = first_L
-
-
-             R_croise = cipher_function(key[x+1],R)
-             L = L^R_croise    
-             R = L
-        """
     #Final permutation
     LplusR = L + R
     output_final = []   
 
     for x in range(len(LplusR)):
-        output_final.insert([IP_Inverse[x]-1], LplusR[x])
+        output_final.insert(IP_Inverse[x]-1, LplusR[x])
 
     print("\n===============================================================================\n")
     print(output_final)
+    print("\n===============================================================================\n")
+    cipher_lisible = hex(int("".join(str(x) for x in output_final),2))
+    print(cipher_lisible)
 
-    return output_final
+    return cipher_lisible
 
 encryption(message_test,cle_test)
 
