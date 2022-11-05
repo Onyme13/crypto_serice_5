@@ -16,7 +16,6 @@ def Initialization(Input):
 
     return left_half,right_half
 
-
 """======================================================================================="""
 
 #GOOD
@@ -25,7 +24,7 @@ def key_generation(Key):
     keys= []
     output = [2] * len(Key)
 
-    
+    print(len(PC_1))
     for x in range(len(PC_1)):
         output[x] = Key[PC_1[x]-1]
     left_half = output[0:28]
@@ -40,6 +39,9 @@ def key_generation(Key):
         #binary rotation
         left = left_half[rotation:] + left_half[0:rotation]
         right = right_half[rotation:] + right_half[0:rotation]
+        
+        left_half = left
+        right_half = right
 
         full = left + right
 
@@ -129,19 +131,18 @@ def encryption(Input,Key):
     #Final permutation
     LplusR = Lfinal + R
     output_final = [2] * len(IP_Inverse)
-
     #GOOD
-    for x in range(len(IP_Inverse)):
+    for x in range(len(LplusR)):
         output_final[x] = LplusR[IP_Inverse[x]-1]
 
 
+    #Merci pour le délai. A bientôt ;)
     print("\n===============================================================================\n")
     print(output_final)
     print("\n===============================================================================\n")
     cipher_lisible = hex(int("".join(str(x) for x in output_final),2))
     print(cipher_lisible)
 
-    return cipher_lisible
 
 encryption(message_test,cle_test)
 
