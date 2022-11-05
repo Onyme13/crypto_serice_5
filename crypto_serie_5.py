@@ -3,10 +3,11 @@ from DES_tables import *
 
 #Initial Permutation
 def Initialization(Input):
-    output = [0] * len(IP)
+    output = [] 
 
     for x in range(len(Input)):
-        output[IP[x]-1] = Input[x]
+        output.insert(IP[x]-1, Input[x])
+        #output[IP[x]-1] = Input[x]
 
     half = int(len(Input)/2)
     left_half = output[0:half]
@@ -26,7 +27,6 @@ def key_generation(Key):
         output = Key
         #key = [2] * 48
         key = []
-
 
         for x in range(len(PC_1)):
             output[PC_1[x]-1] = Key[x]
@@ -64,8 +64,6 @@ def cipher_function(right_half, keys):
     #1
     for x in range(len(E)):
         R[E[x]-1] = right_half[x % (len(right_half))]
-    print(len(R))
-    print(len(keys))
     #print(len(output))
 
     #2    
@@ -94,9 +92,8 @@ def cipher_function(right_half, keys):
         int_value_replacement = S_Boxes[x][y_value][x_value]
         bin_value_replacement = bin(int_value_replacement).replace("0b","") 
 
-        if len(bin_value_replacement) < 4:
+        while len(bin_value_replacement) < 4:
             bin_value_replacement = '0' + bin_value_replacement
-
         A_replacement += bin_value_replacement
     #4
     final = []
@@ -117,12 +114,17 @@ def encryption(Input,Key):
 
     #premier round
     while x < 16:
+        print("YYY")
         Rxor = cipher_function(R,key[x])
         Lfinal = []
+        print(Rxor)
+        print(L)
 
-        for x in range(len(Rxor)):
-            Lfinal.append(L[x] ^ int(Rxor[x]))
+
+        for i in range(len(Rxor)):
+            Lfinal.append(L[i] ^ int(Rxor[i]))
         
+        print(Lfinal)
         L = R
         R = Lfinal
         x+=1
